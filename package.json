@@ -13,7 +13,9 @@
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate",
     "test": "node --test tests/*.test.mjs",
-    "deploy": "node scripts/deploy-cloudflare.mjs"
+    "deploy": "node scripts/deploy-cloudflare.mjs",
+    "build:showcase": "vite build --config vite.showcase.config.ts",
+    "preview:showcase": "vite preview --config vite.showcase.config.ts --host 0.0.0.0"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

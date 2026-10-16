@@ -111,3 +111,9 @@ node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1
 - 浏览器使用独立缓存名称；不要将原站点签名结果直接写入新数据库。公开快照、比较和情景计算可在未配置外部服务时浏览。
 - `scripts/production-qa.mjs` 需要显式指定 `SITE_URL`，不会默认请求旧站点。
 - 独立版本本次检查见 `docs/STUDIO_VALIDATION.md`。
+
+## Cloudflare Workers 独立部署
+
+Cloudflare Git 集成配置：项目名 `embodied-research-studio`，构建命令 `npm run build`，部署命令 `npm run deploy`。D1绑定 `DB` 指向本项目独立数据库。部署脚本先应用尚未执行的 SQL 迁移，再发布 Worker；迁移失败时不会继续发布。数据库 ID 是资源标识，不是访问密钥。
+
+API密钥与访问码仍需在 Worker 的服务端 Secrets 中设置。数据库配置修复不代表线上发布或 API 验证已完成。

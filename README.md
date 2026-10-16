@@ -1,16 +1,113 @@
-# Embodied Research Studio
+# 具身研究工作室 · Embodied Research Studio
 
-An evidence-driven research workspace for the robotics industry.
+研究机器人精细操作所需的执行与感知产业链：微型驱动与传动、灵巧手、力觉/触觉、3D视觉，并连接到装配、分拣、柔顺抓取、研究与遥操作等下游应用。
 
-## Product scope
+这是面向机器人产业的证据研究工作台，包含云端确认记录和真实公告闭环。产品重点是证据可追溯、口径可解释、更新可验证。不是交易建议工具。
 
-- Explore robotics industry relationships with traceable source evidence.
-- Compare businesses and products using consistent research criteria.
-- Track events, assumptions, and evidence changes.
-- Extract and review structured evidence with AI assistance.
+## 访问与运行
 
-## Development status
+源码仓库：[Embodied Research Studio](https://github.com/xialuoteyaoyunyi/-)。这是独立源码版本；新部署地址尚未配置。原产品的密钥、数据库记录与托管身份未复制。
 
-This independent portfolio edition is being prepared. Application source has not yet been imported, and no new deployment is live.
+环境：Node.js 22.13以上，npm。开发服务基于 React、Vinext、Vite；生产打包为 Cloudflare Worker，保留 Sites 托管适配。部署平台集成位于 `build/sites-vite-plugin.ts`，不是单纯静态页面。
 
-The existing Embodied Evidence Lab deployment and repository remain separate. This edition removes interview submission checklists and reviewer-specific presentation content while retaining research methodology and accurate capability boundaries.
+```sh
+npm ci
+cp .env.example .env.local
+# 在 .env.local 中填写 KIMI_API_KEY
+node --env-file=.env.local scripts/run-framework.mjs dev
+# http://127.0.0.1:5173/
+npm test
+node node_modules/typescript/bin/tsc --noEmit
+npm run build
+```
+
+
+## 目标用户与核心任务
+
+目标用户为产业研究员、投研助理及需要核对概念业务关系的投资者。典型任务：一个机器人主题下有哪些环节？某家公司与环节的关系有何证据？海外同行究竟哪部分可比？外部变化通过什么经营变量影响财务？新材料是否改变原有判断？
+
+## 主链路设计
+
+1. **产业链分类**：按交付产品与功能划分。L1是执行部件、力觉/触觉、3D视觉；L2是灵巧手及闭环控制；L3是精细操作应用。一家公司可属于多个环节。图谱表示功能依赖，不能据此声称公司之间供货。
+2. **公司关系判断**：每条关系包含公司、具体概念、环节、业务阶段、陈述、原文摘录/关键词、材料日期、期间、页码/章节、限制和验证状态。
+3. **跨市场比较**：兆威/FAULHABER比较微型执行部件；兆威/Shadow比较灵巧手；柯力/ATI比较六维力；奥比/RealSense比较双目深度视觉。明确非上市产品同行、上市集团子业务与集团财务的区别；不产生无同口径支撑的PE排名。
+4. **事件传导**：记录外部变化→产业环节→公司业务→经营驱动→财务指标，并提供成立条件、反证与观察指标。政策与海外产品观察有原始来源；需求变化为显式假设情景。
+5. **更新**：用户输入/导入公开材料相关段落，填写来源与定位；Kimi提取；代码验证来源域名、字段、精确引用、阶段及收入口径；用户确认；校验服务端签名并追加至D1云端记录，同时保留本机缓存和导出版本。相同公司、环节与具体关系名称构成版本身份。较旧材料只补充历史，不覆盖较新判断。
+
+## 业务阶段与可信度
+
+| 级别 | 含义 | 不可推导 |
+|---|---|---|
+| E4 | 对应产品/业务收入金额与口径明确 | 不能把广义产品收入全部算成人形机器人收入 |
+| E3 | 明确销售、交付、订单或未量化业务收入 | 不能由销量推导收入占比 |
+| E2 | 产品、研发、送样、制造推进 | 生产推进不等于销售或交付 |
+| E1 | 规划、意向或战略投资 | 股权关系不等于自产或供货 |
+| E0 | 本研究材料中证据不足 | 不代表业务不存在 |
+
+业务成熟度不是可信度。法定披露对公司自身陈述支持较强；官方产品材料只能支持产品与技术陈述；用户新增材料在未独立抓取核验时明确标注来源边界。没有经过校准的概率，不使用“可信度95%”等虚假精确表述。年报中的管理层陈述也不等于独立业务审计。
+
+## AI角色及验证
+
+Kimi `kimi-k2.6` 实际调用用于结构化关系提取和基于现有官方证据的问答。提示词版本、真实请求ID、模型、token用量、输入哈希、原文和结果一并保留。问答的引用ID必须属于选中公司的证据集合。模型不能自行生成可采信的来源、金额、供应关系、目标价或交易指令。
+
+Codex辅助完成研究设计、官方材料查找、代码实现和测试。基础快照由Codex对官方材料进行原文与数值核对，不伪称用户已经人工审阅全部原文。用户在产品中点击确认才记录“用户已确认”。
+
+验证记录见 `docs/AI_USAGE.md`、`docs/ai-validation.json`、`docs/ai-validation-initial.json` 与 `docs/baseline-validation.json`。初轮失败不会从记录删除。示例材料是有来源的节选或表格文字化，不是整份年报上传；产品中的输入仍需用户核对原始材料。
+
+## 数据来源与使用边界
+
+- **扶摇**：已实现服务端 REST 接入，实际验证三家样本的行情、估值和集团利润表。配置 FUYAO_API_KEY；本地运行时填入 .env.local，单独接口验证可用 .env.fuyao，部署用服务端 secret。在“证据与来源”输入研究访问码后查询，保留接口地址、request_id、上游时间、抓取时间及原始字段，支持导出。5分钟进程缓存；不拉取全市场或板块成分。
+- **iFinD MCP**：配置独立授权密钥后可使用，安装并实际调用官方ifind-finance-data 1.4.0 Skill。六个服务的25个工具清单已验证，公告、主营业务、行业指标、宏观、期货和海外财务均有真实试查。网站通过官网同源HTTPS MCP代理接入（官网调试界面使用相同路径），服务端工具白名单与权限清单双重校验。IFIND_AUTHORIZATION仅存服务端secret；查询使用研究访问码。当前无专门产业链图谱或研报工具，不用新闻替代研报、不用板块名单证明业务关系。
+- **补充材料**：2025年度公司年报原件来自巨潮资讯；公司官网与官方投资者关系页；工信部政策文件。研究结论不使用媒体转述、社区帖子、无来源供应链传闻。
+- 官方材料清单与访问日期位于 `lib/research-data.ts`。三份年报下载后记录SHA-256，关键数字保留元单位与页序。页面展示亿元是元数值除以1e8后四舍五入，原始值不被覆盖。
+- 案例：奥比3D视觉传感器产品收入不是机器人收入；柯力集团收入及传统力学系列收入不是六维力机器人收入；兆威集团收入不是灵巧手收入。
+- 公司业务证据基线仍以2025年报为主。扶摇面板另行查询最新两个报告期集团利润表，报告期原值不拆单季、不覆盖已核验业务证据。海外未提供的可比财务显示未提供，不用零填充。
+- 扶摇为可选授权数据源，官方材料补充业务归属证据。`lib/fuyao.mjs`为真实接口适配器；`lib/data-adapters.ts`保留文档接入契约。密钥仅在服务端，接口受研究访问码保护；获取权限不等于开放再分发授权，不公开预置商业接口响应。错误、空值及缺失股票明确显示，不生成假数据。
+
+## 可更新性与已知边界
+
+确认记录写入Cloudflare D1，按关系与输入哈希去重，保留原材料、模型、来源验证、创建与确认时间。服务端HMAC签名验证阻止篡改候选结果写入；同一发布日期按签名覆盖的提取时间排序。云端是追加式历史，浏览器localStorage作为缓存，支持导出和导入。访问码授权的同一研究工作台可以同步云端版本。仍无定时采集、全量公告索引、企业SSO、多租户或细粒度RBAC。URL可访问性检查不等于内容更新。
+
+任意新增材料仍使用公开文本，引用匹配不证明输入与远程官方原件一致。真实案例提供柯力2026半年报预先核对的PDF片段：iFinD仅作发现线索，服务端重新下载固定官方PDF并比对SHA-256后标记来源匹配。这个核验只覆盖登记案例，不泛化为任意PDF在线解析。Kimi提取需精确引用和业务口径校验，人工确认后进入当前版本问答；问答必须引用当前有效ID，事实数字检查对应引用材料，不进行无依据数值补全。该检查不等于完整语义蕴含证明。
+
+公司与来源样本有限，触觉板块侧重柯力战略投资和研发关系；不代表触觉供应商全市场覆盖。未建立产品测试数据库，无法独立验证厂商规格、寿命或精度。未做投资回报预测、组合推荐、目标价、付费研报转载、账户交易或个人数据采集。
+
+情景计算是用户假设，收入=机器人交付量×部件采用率×单机数量×供应份额×平均售价，固定假设毛利率用于演示；未含税、费用、回款和行业弹性估计，不对应任何实际公司。
+
+单实例每分钟限流是原型防护，并非分布式严格配额。公开AI仍依赖私有访问码与Kimi账户额度，生产应用需要账户体系和集中式配额。
+
+## 测试与验证
+
+`docs/TESTING.md`覆盖主链路、数据与接口异常、合规边界、实际执行结果和未验证事项。核心逻辑测试运行于Node；浏览器脚本使用Playwright和本机Edge。实际Kimi调用测试不模拟模型输出，另有确定性验证器测试覆盖伪造引用、收入口径和非法来源。
+
+`scripts/qa-browser.mjs`及`scripts/live-ai-validation.mjs`需要开发服务运行；浏览器脚本默认调用本机无需访问码服务。运行真实AI验证会产生少量API费用。项目包含源码、README、测试与AI记录
+
+## 源码结构
+
+`app/page.tsx`：交互工作台。`app/api/ai`：鉴权、输入限制、Kimi调用与结果校验。`lib/research-data.ts`：有来源的基础研究快照。`lib/research-core.mjs`：验证、版本决策与情景计算。`lib/fuyao.mjs`与`lib/ifind.mjs`：真实数据接口；`lib/review-integrity.ts`：来源核验与签名；`app/api/records`：D1确认记录；`lib/data-adapters.ts`：通用接入契约。`docs`：技术验证记录。`work`、`outputs`、`.env*`默认忽略，不进入公开仓库。
+
+扶摇官方接口定义：[快速开始](https://fuyao.aicubes.cn/docs/quickstart/)、[财务报表](https://fuyao.aicubes.cn/docs/api-reference/financials/)、[估值](https://fuyao.aicubes.cn/docs/api-reference/valuations/)。实际鉴权验证见docs/fuyao-validation.json，本站路由验证见docs/fuyao-api-validation.json。
+
+## 真实案例与云端运行
+
+“持续更新”中执行柯力2026半年报案例：检索线索和官方PDF哈希核验 → 载入片段 → Kimi提取 → 核对后确认 → 云端保存 → 公司卡片及当前版本问答。销量从2025年报超过1500只更新到2026上半年超过2000只，均为E3，不自动升为E4。集团财务在PDF第5页；机器人业务在第9页，不把集团增长归因于该业务。真实记录见docs/closed-loop-validation.json。
+
+托管配置`.openai/hosting.json`保留D1绑定DB，但不含原站点project_id；新部署必须分配独立身份与数据库；Drizzle迁移在drizzle目录，Sites发布时应用生产迁移。本地需先构建，再运行：
+
+```sh
+node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_bent_roxanne_simpson.sql
+```
+
+不要重复执行已应用迁移。设置独立随机REVIEW_SIGNING_KEY；修改该密钥会使旧结果签名无法用于新增写入或问答，应有计划地迁移。当前未实现密钥轮换、多租户或长时间SLA验证，不宣称生产稳定性认证。
+
+正式记录与验收记录按research/validation命名空间分离。自动化测试不等于用户亲自审阅，不进入正式研究主记录。云端问答使用记录ID降低浏览器请求大小；最多10条证据，每条保留原始引用和最多4000字材料前缀，不宣称全文件检索。
+
+## 独立版本与部署准备
+
+本仓库完整保留研究数据、交互功能、服务端适配器、数据库迁移和测试，产品入口改为“关于产品”，展示能力与研究方法。提交清单与录制要求已移除。
+
+- 本次未迁移原站点的私密配置、云端记录或用户文件。历史验证文件记录继承代码的测试背景，不代表新站点已部署或上游接口已重新验证。
+- 新部署需配置 `KIMI_API_KEY`、`RESEARCH_ACCESS_CODE`、`REVIEW_SIGNING_KEY` 与独立 D1 `DB`；扶摇和 iFinD 分别使用可选的 `FUYAO_API_KEY`、`IFIND_AUTHORIZATION`。密钥只保存在服务端环境变量。
+- 浏览器使用独立缓存名称；不要将原站点签名结果直接写入新数据库。公开快照、比较和情景计算可在未配置外部服务时浏览。
+- `scripts/production-qa.mjs` 需要显式指定 `SITE_URL`，不会默认请求旧站点。
+- 独立版本本次检查见 `docs/STUDIO_VALIDATION.md`。
